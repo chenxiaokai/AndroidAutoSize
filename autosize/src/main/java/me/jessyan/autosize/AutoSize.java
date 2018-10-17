@@ -296,6 +296,9 @@ public final class AutoSize {
         }
 
         /*
+
+        TypedValue.applyDimension 方法的源码
+
         public static float applyDimension(int unit, float value, DisplayMetrics metrics)
         {
             switch (unit) {
