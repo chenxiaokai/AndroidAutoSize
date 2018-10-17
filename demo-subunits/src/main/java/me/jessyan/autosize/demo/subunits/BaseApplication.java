@@ -39,6 +39,9 @@ public class BaseApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        System.out.println("-------cxk------ BaseApplication.onCreate() thread = "+Thread.currentThread().getName());
+
         //对单位的自定义配置, 请在 App 启动时完成 
         configUnits();
     }

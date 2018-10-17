@@ -161,6 +161,7 @@ public final class AutoSize {
 
         int screenSize = isBaseOnWidth ? AutoSizeConfig.getInstance().getScreenWidth()
                 : AutoSizeConfig.getInstance().getScreenHeight();
+
         String key = sizeInDp + "|" + isBaseOnWidth + "|"
                 + AutoSizeConfig.getInstance().isUseDeviceSize() + "|"
                 + AutoSizeConfig.getInstance().getInitScaledDensity() + "|"
@@ -173,14 +174,24 @@ public final class AutoSize {
         float targetScaledDensity = 0;
         float targetXdpi = 0;
 
+        /*
+         屏幕适配的核心的公式
+          px = density * dp;
+          density = dpi / 160;
+          px = dp * (dpi / 160);
+
+          dpi 参考 https://mp.weixin.qq.com/s/d9QCoBP6kV9VSWvVldVVwA
+         */
         if (displayMetricsInfo == null) {
             if (isBaseOnWidth) {
                 targetDensity = AutoSizeConfig.getInstance().getScreenWidth() * 1.0f / sizeInDp;
             } else {
                 targetDensity = AutoSizeConfig.getInstance().getScreenHeight() * 1.0f / sizeInDp;
             }
+
             targetScaledDensity = targetDensity * (AutoSizeConfig.getInstance().
                     getInitScaledDensity() * 1.0f / AutoSizeConfig.getInstance().getInitDensity());
+
             targetDensityDpi = (int) (targetDensity * 160);
 
             if (isBaseOnWidth) {
@@ -283,6 +294,29 @@ public final class AutoSize {
         if (AutoSizeConfig.getInstance().getUnitsManager().isSupportSP()) {
             displayMetrics.scaledDensity = scaledDensity;
         }
+
+        /*
+        public static float applyDimension(int unit, float value, DisplayMetrics metrics)
+        {
+            switch (unit) {
+            case COMPLEX_UNIT_PX:
+                return value;
+            case COMPLEX_UNIT_DIP:
+                return value * metrics.density;
+            case COMPLEX_UNIT_SP:
+                return value * metrics.scaledDensity;
+            case COMPLEX_UNIT_PT:
+                return value * metrics.xdpi * (1.0f/72);
+            case COMPLEX_UNIT_IN:
+                return value * metrics.xdpi;
+            case COMPLEX_UNIT_MM:
+                return value * metrics.xdpi * (1.0f/25.4f);
+            }
+            return 0;
+        }
+        系统api只用到了xdpi这个变量
+         */
+
         switch (AutoSizeConfig.getInstance().getUnitsManager().getSupportSubunits()) {
             case NONE:
                 break;

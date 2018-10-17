@@ -32,6 +32,10 @@ import android.net.Uri;
 public class InitProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
+
+        System.out.println("-------cxk------ InitProvider.onCreate() thread = "+Thread.currentThread().getName());
+        //InitProvider 中的onCreate 比 BaseApplication中的 onCreate先执行，并且都在主线程中
+
         AutoSizeConfig.getInstance()
                 .setLog(true)
                 .init((Application) getContext().getApplicationContext())

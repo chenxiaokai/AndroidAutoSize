@@ -172,13 +172,19 @@ public final class AutoSizeConfig {
     AutoSizeConfig init(final Application application, boolean isBaseOnWidth, AutoAdaptStrategy strategy) {
         Preconditions.checkArgument(mInitDensity == -1, "AutoSizeConfig#init() can only be called once");
         Preconditions.checkNotNull(application, "application == null");
+
         this.mApplication = application;
         this.isBaseOnWidth = isBaseOnWidth;
         final DisplayMetrics displayMetrics = Resources.getSystem().getDisplayMetrics();
 
+        //获取在 AndroidManifest.xml中的 meta信息
         getMetaData(application);
+
         isVertical = application.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+
+        //得到屏幕的 像素 宽度和高度
         int[] screenSize = ScreenUtils.getScreenSize(application);
+
         mScreenWidth = screenSize[0];
         mScreenHeight = screenSize[1];
         LogUtils.d("designWidthInDp = " + mDesignWidthInDp + ", designHeightInDp = " + mDesignHeightInDp + ", screenWidth = " + mScreenWidth + ", screenHeight = " + mScreenHeight);
@@ -187,13 +193,14 @@ public final class AutoSizeConfig {
         mInitDensityDpi = displayMetrics.densityDpi;
         mInitScaledDensity = displayMetrics.scaledDensity;
         mInitXdpi = displayMetrics.xdpi;
+
+        //监听字体切换
         application.registerComponentCallbacks(new ComponentCallbacks() {
             @Override
             public void onConfigurationChanged(Configuration newConfig) {
                 if (newConfig != null) {
                     if (newConfig.fontScale > 0) {
-                        mInitScaledDensity =
-                                Resources.getSystem().getDisplayMetrics().scaledDensity;
+                        mInitScaledDensity = Resources.getSystem().getDisplayMetrics().scaledDensity;
                         LogUtils.d("initScaledDensity = " + mInitScaledDensity + " on ConfigurationChanged");
                     }
                     isVertical = application.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
@@ -208,7 +215,11 @@ public final class AutoSizeConfig {
 
             }
         });
+
         LogUtils.d("initDensity = " + mInitDensity + ", initScaledDensity = " + mInitScaledDensity);
+
+
+        //ActivityLifecycleCallbacksImpl 在activity 启动后 会分别来调用 activity 各个生命周期的方法
         mActivityLifecycleCallbacks = new ActivityLifecycleCallbacksImpl(strategy == null ? new DefaultAutoAdaptStrategy() : strategy);
         application.registerActivityLifecycleCallbacks(mActivityLifecycleCallbacks);
         return this;
